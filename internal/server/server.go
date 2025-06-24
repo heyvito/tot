@@ -7,6 +7,7 @@ import (
 	"github.com/heyvito/tot/internal/secureconn"
 	"log"
 	"net"
+	"os"
 	"os/exec"
 
 	"github.com/heyvito/tot/internal/auth"
@@ -65,6 +66,8 @@ func handleConn(conn net.Conn, shell string, authorizedKeys map[string]auth.Publ
 	log.Printf("Authenticated %s (%s)", conn.RemoteAddr(), clientKey)
 
 	cmd := exec.Command(shell)
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, fmt.Sprintf("TOT_CONNECTION=true"))
 	ptmx, err := pty.Start(cmd)
 	if err != nil {
 		log.Printf("PTY error: %v", err)
